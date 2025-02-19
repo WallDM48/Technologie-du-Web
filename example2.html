@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemple de base HTML, CSS et JavaScript</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f0f2f5;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 20px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #28a745;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenue dans le monde du web !</h1>
+    <p>Ceci est un exemple simple d'une page HTML avec du CSS et du JavaScript.</p>
+
+    <button onclick="displayMessage()">Cliquez ici</button>
+    <div id="message"></div>
+
+    <hr>
+
+    <h2>Entrez votre nom :</h2>
+    <input type="text" id="username" placeholder="Votre nom">
+    <button onclick="printName()">Afficher le nom</button>
+    <div id="nameOutput"></div>
+
+    <script>
+        function displayMessage() {
+            document.getElementById('message').innerText = 'Bonjour, vous avez interagi avec JavaScript !';
+        }
+
+        function printName() {
+            const name = document.getElementById('username').value;
+            if (name) {
+                document.getElementById('nameOutput').innerText = `Bonjour, ${name} !`;
+            } else {
+                document.getElementById('nameOutput').innerText = "Veuillez entrer votre nom.";
+            }
+        }
+    </script>
+</body>
+</html>

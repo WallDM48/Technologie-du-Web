@@ -1,5 +1,48 @@
-<html>
-    <head>
-        <p> Bonjour tout le monde</p>
-    </head>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Premier Page</title>
+      <style>
+          button {
+              margin: 10px;
+              padding: 10px;
+              font-size: 16px;
+          }
+      </style>
+  </head>
+  <body style="text-align: center">
+      <h1>FFOE - Calculatrice</h1>
+      <button onclick="performAddition()">Addition</button>
+
+      <script>
+          function performAddition() {
+              let num1 = prompt("Введите първото число:");
+              let num2 = prompt("Введите второто число:");
+
+              if (isNaN(num1) || isNaN(num2)) {
+                  alert("Моля, въведете валидни числа.");
+                  return;
+              }
+
+              fetch('http://127.0.0.1:5000/perform-addition', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ num1: parseFloat(num1), num2: parseFloat(num2) })
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.result !== undefined) {
+                      alert("Резултат: " + data.result);
+                  } else {
+                      alert("Грешка: Не получихме резултата от сървъра.");
+                  }
+              })
+              .catch(error => {
+                  console.error('Ошибка:', error);
+                  alert("Имаше грешка при изпълнението на заявката.");
+              });
+          }
+      </script>
+  </body>
 </html>
