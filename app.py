@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Добавяне на CORS
+#from flask_cors import CORS  # Добавяне на CORS
 
 app = Flask(__name__)
-CORS(app)  # Активираме CORS
+#CORS(app)  # Активираме CORS
 
 @app.route('/perform-addition', methods=['POST'])
 def perform_addition():

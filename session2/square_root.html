@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de racine carrée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculateur de racine carrée</h1>
+    <input type="number" id="numberInput" placeholder="Entrez un nombre">
+    <button onclick="calculateSquareRoot()">Calculer</button>
+    <p id="result"></p>
+
+    <script>
+        function calculateSquareRoot() {
+            const number = document.getElementById("numberInput").value;
+            fetch("http://127.0.0.1:5000/square-root", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ number: number })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerText = "Résultat: " + data.result;
+            })
+            .catch(error => console.error("Erreur:", error));
+        }
+    </script>
+</body>
+</html>

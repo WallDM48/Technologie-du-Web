@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de tâches</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+        }
+        .task-item {
+            background: #f0f2f5;
+            padding: 10px;
+            margin: 5px auto;
+            width: 50%;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 5px;
+        }
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestionnaire de tâches</h1>
+    
+    <input type="text" id="taskInput" placeholder="Ajouter une tâche">
+    <button onclick="addTask()">Ajouter</button>
+
+    <h2>Liste des tâches</h2>
+    <div id="taskList"></div>
+
+    <script>
+        async function fetchTasks() {
+            const response = await fetch("http://127.0.0.1:5000/tasks");
+            const tasks = await response.json();
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = "";
+            
+            tasks.forEach(task => {
+                const div = document.createElement("div");
+                div.classList.add("task-item");
+                div.innerHTML = `
+                    <span>${task.title}</span>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">X</button>
+                `;
+                taskList.appendChild(div);
+            });
+        }
+
+        async function addTask() {
+            const taskInput = document.getElementById("taskInput");
+            const title = taskInput.value;
+            if (!title) return;
+
+            await fetch("http://127.0.0.1:5000/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title })
+            });
+
+            taskInput.value = "";
+            fetchTasks();
+        }
+
+        async function deleteTask(taskId) {
+            await fetch(`http://127.0.0.1:5000/tasks/${taskId}`, {
+                method: "DELETE"
+            });
+
+            fetchTasks();
+        }
+
+        fetchTasks();
+    </script>
+</body>
+</html>
