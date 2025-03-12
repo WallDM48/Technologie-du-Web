@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Book Management System</h2>
+    <form id="bookForm">
+        <input type="text" id="title" placeholder="Book Title" required>
+        <input type="text" id="author" placeholder="Author" required>
+        <button type="submit">Add Book</button>
+    </form>
+    <button id="loadBooksButton">Show Books</button>
+    <button id="toggleBooksButton" style="display:none;">Hide Books</button> <!-- Нов бутон -->
+    <ul id="bookList"></ul>
+    
+    <script>
+        document.getElementById("bookForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const title = document.getElementById("title").value;
+            const author = document.getElementById("author").value;
+
+            await fetch("http://localhost:5000/books", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, author })
+            });
+
+            // Зануляване на полетата след изпращане на формата
+            document.getElementById("title").value = "";
+            document.getElementById("author").value = "";
+        });
+
+        document.getElementById("loadBooksButton").addEventListener("click", loadBooks);
+        document.getElementById("toggleBooksButton").addEventListener("click", toggleBooks); // Обработчик за новия бутон
+
+        async function loadBooks() {
+            const response = await fetch("http://localhost:5000/books");
+            const books = await response.json();
+            const bookList = document.getElementById("bookList");
+            bookList.innerHTML = books.map(book => `<li>${book.title} by ${book.author}</li>`).join("");
+
+            // Скриване на бутона за показване на книги след зареждане
+            document.getElementById("loadBooksButton").style.display = "none";
+            document.getElementById("toggleBooksButton").style.display = "inline-block"; // Показване на бутона за скриване
+        }
+
+        function toggleBooks() {
+            const bookList = document.getElementById("bookList");
+            const isVisible = bookList.style.display !== "none";
+            bookList.style.display = isVisible ? "none" : "block";
+
+            // Променяме текста на бутона в зависимост от видимостта на книгите
+            const toggleButton = document.getElementById("toggleBooksButton");
+            toggleButton.textContent = isVisible ? "Show Books" : "Hide Books";
+        }
+    </script>
+</body>
+</html>
