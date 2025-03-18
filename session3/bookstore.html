@@ -14,6 +14,16 @@
         }
         ul {
             list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -25,7 +35,7 @@
         <button type="submit">Add Book</button>
     </form>
     <button id="loadBooksButton">Show Books</button>
-    <button id="toggleBooksButton" style="display:none;">Hide Books</button> <!-- Нов бутон -->
+    <button id="hideBooksButton" style="display: none;">Hide Books</button>
     <ul id="bookList"></ul>
     
     <script>
@@ -40,33 +50,40 @@
                 body: JSON.stringify({ title, author })
             });
 
-            // Зануляване на полетата след изпращане на формата
             document.getElementById("title").value = "";
             document.getElementById("author").value = "";
+
         });
 
-        document.getElementById("loadBooksButton").addEventListener("click", loadBooks);
-        document.getElementById("toggleBooksButton").addEventListener("click", toggleBooks); // Обработчик за новия бутон
+        document.getElementById("loadBooksButton").addEventListener("click", function() {
+            loadBooks();
+            document.getElementById("hideBooksButton").style.display = "inline-block";
+            document.getElementById("loadBooksButton").style.display = "none";
+        });
+
+        document.getElementById("hideBooksButton").addEventListener("click", function() {
+            document.getElementById("bookList").innerHTML = "";
+            document.getElementById("hideBooksButton").style.display = "none";
+            document.getElementById("loadBooksButton").style.display = "inline-block";
+        });
 
         async function loadBooks() {
             const response = await fetch("http://localhost:5000/books");
             const books = await response.json();
             const bookList = document.getElementById("bookList");
-            bookList.innerHTML = books.map(book => `<li>${book.title} by ${book.author}</li>`).join("");
-
-            // Скриване на бутона за показване на книги след зареждане
-            document.getElementById("loadBooksButton").style.display = "none";
-            document.getElementById("toggleBooksButton").style.display = "inline-block"; // Показване на бутона за скриване
+            bookList.innerHTML = books.map(book => `
+                <li>
+                    ${book.title} by ${book.author}
+                    <button onclick="deleteBook(${book.id})">Delete</button>
+                </li>
+            `).join("");
         }
 
-        function toggleBooks() {
-            const bookList = document.getElementById("bookList");
-            const isVisible = bookList.style.display !== "none";
-            bookList.style.display = isVisible ? "none" : "block";
-
-            // Променяме текста на бутона в зависимост от видимостта на книгите
-            const toggleButton = document.getElementById("toggleBooksButton");
-            toggleButton.textContent = isVisible ? "Show Books" : "Hide Books";
+        async function deleteBook(bookId) {
+            await fetch(`http://localhost:5000/books/${bookId}`, {
+                method: "DELETE"
+            });
+            loadBooks();
         }
     </script>
 </body>
