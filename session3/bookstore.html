@@ -21,9 +21,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         button {
-            margin-left: 10px;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .delete-button {
+            background-color: red;
+            color: white;
+        }
+        .sell-button {
+            background-color: green;
+            color: white;
+        }
+        .show-sold-button {
+            background-color: blue;
+            color: white;
         }
     </style>
 </head>
@@ -36,7 +55,10 @@
     </form>
     <button id="loadBooksButton">Show Books</button>
     <button id="hideBooksButton" style="display: none;">Hide Books</button>
+    <button id="showSoldBooksButton" class="show-sold-button">Show Sold Books</button>
+    <button id="hideSoldBooksButton" style="display: none;" class="show-sold-button">Hide Sold Books</button>
     <ul id="bookList"></ul>
+    <ul id="soldBookList"></ul>
     
     <script>
         document.getElementById("bookForm").addEventListener("submit", async function(event) {
@@ -52,7 +74,6 @@
 
             document.getElementById("title").value = "";
             document.getElementById("author").value = "";
-
         });
 
         document.getElementById("loadBooksButton").addEventListener("click", function() {
@@ -67,6 +88,18 @@
             document.getElementById("loadBooksButton").style.display = "inline-block";
         });
 
+        document.getElementById("showSoldBooksButton").addEventListener("click", function() {
+            loadSoldBooks();
+            document.getElementById("hideSoldBooksButton").style.display = "inline-block";
+            document.getElementById("showSoldBooksButton").style.display = "none";
+        });
+
+        document.getElementById("hideSoldBooksButton").addEventListener("click", function() {
+            document.getElementById("soldBookList").innerHTML = "";
+            document.getElementById("hideSoldBooksButton").style.display = "none";
+            document.getElementById("showSoldBooksButton").style.display = "inline-block";
+        });
+
         async function loadBooks() {
             const response = await fetch("http://localhost:5000/books");
             const books = await response.json();
@@ -74,7 +107,19 @@
             bookList.innerHTML = books.map(book => `
                 <li>
                     ${book.title} by ${book.author}
-                    <button onclick="deleteBook(${book.id})">Delete</button>
+                    <button class="delete-button" onclick="deleteBook(${book.id})">Delete</button>
+                    <button class="sell-button" onclick="sellBook(${book.id})">Sell</button>
+                </li>
+            `).join("");
+        }
+
+        async function loadSoldBooks() {
+            const response = await fetch("http://localhost:5000/books/sold");
+            const books = await response.json();
+            const soldBookList = document.getElementById("soldBookList");
+            soldBookList.innerHTML = books.map(book => `
+                <li>
+                    ${book.title} by ${book.author} - Sold for $${book.price}
                 </li>
             `).join("");
         }
@@ -84,6 +129,18 @@
                 method: "DELETE"
             });
             loadBooks();
+        }
+
+        async function sellBook(bookId) {
+            const price = prompt("Enter the selling price:");
+            if (price !== null && price.trim() !== "") {
+                await fetch(`http://localhost:5000/books/sell/${bookId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ price: parseInt(price.trim()) })
+                });
+                loadBooks(); // Reload books after selling
+            }
         }
     </script>
 </body>
